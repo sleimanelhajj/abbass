@@ -61,18 +61,20 @@ SHAPES = {
 def shift_shape_coords(shape_coords, grid_size):
     """Move shape to be centered in the grid and ensure it stays within bounds."""
     rows, cols = grid_size
-
-    min_r = min(r for r, _ in shape_coords)
-    min_c = min(c for _, c in shape_coords)
     
-    row_offset = (rows - (max(r for r, _ in shape_coords) - min_r)) // 2
-    col_offset = (cols - (max(c for _, c in shape_coords) - min_c)) // 2
-
-    # Ensure the shape stays inside the grid
-    shifted_coords = [
-        (max(0, min(rows - 1, r + row_offset)), max(0, min(cols - 1, c + col_offset)))
-        for r, c in shape_coords
-    ]
-
+    min_r, max_r = min(r for r, _ in shape_coords), max(r for r, _ in shape_coords)
+    min_c, max_c = min(c for _, c in shape_coords), max(c for _, c in shape_coords)
+    
+    shape_height = max_r - min_r + 1
+    shape_width = max_c - min_c + 1
+    
+    row_offset = max(0, (rows - shape_height) // 2 - min_r)
+    col_offset = max(0, (cols - shape_width) // 2 - min_c)
+    
+    shifted_coords = []
+    for r, c in shape_coords:
+        new_r, new_c = r + row_offset, c + col_offset
+        if 0 <= new_r < rows and 0 <= new_c < cols:
+            shifted_coords.append((new_r, new_c))
+    
     return shifted_coords
-
